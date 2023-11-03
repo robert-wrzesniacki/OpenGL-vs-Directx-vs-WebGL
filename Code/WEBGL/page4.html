@@ -1,0 +1,558 @@
+﻿<html>
+    <head>
+        <title>JavaScript & WebGL: Przekształcenia</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+        <script type="text/javascript" src="three.min.js"></script>
+        <script type="text/javascript" src="Detector.js"></script>
+        <script type="text/javascript" src="uclass_TeapotGeometry.js"></script>
+        <script>
+
+            var scene;
+            var camera;
+
+            var object3d;
+            var figura;
+            var rotacjax;
+            var rotacjay;
+            var rotacjaz;
+            var wybrot;
+            var swiatlo;
+            
+            var updown;
+            var posx;
+            var posy;
+            
+            var skalx;
+            var skaly;
+            var skalz;
+
+            var w1aa;
+            var w1bb;
+            var w1cc;
+            
+            function scalex1(){
+                skalx -= 0.2;
+                wypelnij();
+            }
+            function scalex2(){
+                skalx += 0.2;
+                wypelnij();
+            }
+            function scaley1(){
+                skaly -= 0.2;
+                wypelnij();
+            }
+            function scaley2(){
+                skaly += 0.2;
+                wypelnij();
+            }
+            function scalez1(){
+                skalz -= 0.2;
+                wypelnij();
+            }
+            function scalez2(){
+                skalz += 0.2;
+                wypelnij(); 
+            }
+            function posup(){
+                posy -= 0.5;
+                wypelnij();
+            }
+            function posdown(){
+                posy += 0.5;
+                wypelnij();
+            }
+            function posleft(){
+                posx += 0.5;
+                wypelnij();
+            }
+            function posright(){
+                posx -= 0.5;
+                wypelnij();
+            }
+            function zoomin(){
+                updown -= 0.5;
+                wypelnij();
+            }
+            function zoomout(){
+                updown += 0.5;
+                wypelnij();
+            }
+            function posreset(){
+                posx = 0;
+                posy = 0;
+                updown = 0;
+                skalx = 1;
+                skaly = 1;
+                skalz = 1;
+                wypelnij();
+            }
+            
+            function rotx() {
+                rotacjax = document.getElementById("rx").value * Math.PI / 180;
+                wypelnij();
+            }
+            function roty() {
+                rotacjay = document.getElementById("ry").value * Math.PI / 180;
+                wypelnij();
+            }
+            function rotz() {
+                rotacjaz = document.getElementById("rz").value * Math.PI / 180;
+                wypelnij();
+            }
+            function buton1() {
+                figura = 1;
+                wypelnij();
+            }
+            function buton2() {
+                figura = 2;
+                wypelnij();
+            }
+            function buton3() {
+                figura = 3;
+                wypelnij();
+            }
+            function buton4() {
+                figura = 4;
+                wypelnij();
+            }
+            function buton5() {
+                figura = 5;
+                wypelnij();
+            }
+            function buton6() {
+                figura = 6;
+                wypelnij();
+            }
+            function buton7() {
+                swiatlo = 1;
+                wypelnij();
+            }
+            function buton8() {
+                swiatlo = 2;
+                wypelnij();
+            }
+            function w1a() {
+                w1aa = document.getElementById("w1a").value;
+                wypelnij();
+            }
+            function w1b() {
+                w1bb = document.getElementById("w1b").value;
+                wypelnij();
+            }
+
+            function w1c() {
+                w1cc = document.getElementById("w1c").value;
+                wypelnij();
+            }
+
+            function wybrotacji() {
+                if (document.getElementById("osx").checked && document.getElementById("osy").checked && document.getElementById("osz").checked) {
+                    wybrot = 7;
+                    wypelnij();
+                } else if (document.getElementById("osy").checked && document.getElementById("osz").checked) {
+                    wybrot = 6;
+                    wypelnij();
+                } else if (document.getElementById("osx").checked && document.getElementById("osz").checked) {
+                    wybrot = 5;
+                    wypelnij();
+                } else if (document.getElementById("osx").checked && document.getElementById("osy").checked) {
+                    wybrot = 4;
+                    wypelnij();
+                } else if (document.getElementById("osz").checked) {
+                    wybrot = 3;
+                    wypelnij();
+                } else if (document.getElementById("osy").checked) {
+                    wybrot = 2;
+                    wypelnij();
+                } else if (document.getElementById("osx").checked) {
+                    wybrot = 1;
+                    wypelnij();
+                } else {
+                    wybrot = 0;
+                    wypelnij();
+                }
+            }
+
+            function wypelnij() {
+                document.getElementById("codeview2").value = "scene = new THREE.Scene();\n\
+       \n\
+camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 0.1, 100);\n\
+camera.position.set( 0, 0, 5);\n\
+camera.lookAt(scene.position);\n\
+scene.add(camera);\n\
+\n\
+";
+                if (swiatlo == 1) {
+                    document.getElementById("codeview2").value += "var ambientLight = new THREE.AmbientLight(0x101010, 1.0);\n\
+scene.add(ambientLight);\n\
+\n\
+var directionalLight = new THREE.DirectionalLight(0xfffff7, 1);\n\
+directionalLight.position.set(1, 1, 5);\n\
+scene.add(directionalLight);\n\
+\n\
+var material = new THREE.MeshLambertMaterial({\n\
+\tcolor: \"rgb(" + w1aa + "," + w1bb + "," + w1cc + ")\",\n\
+\tside: THREE.DoubleSide\n\
+\t});\n\
+\n\
+";
+                } else if (swiatlo == 2) {
+                    document.getElementById("codeview2").value += "var material = new THREE.MeshBasicMaterial({\n\
+\tcolor: \"rgb(" + w1aa + "," + w1bb + "," + w1cc + ")\",\n\
+\tside: THREE.DoubleSide\n\
+\t});\n\
+\n\
+";
+                }
+
+                switch (figura) {
+                    case 1:
+                        document.getElementById("codeview2").value += "object3d = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 24), material);\n";
+                        break;
+                    case 2:
+                        document.getElementById("codeview2").value += "object3d = new THREE.Mesh(new THREE.CubeGeometry(1.5, 1.5, 1.5, 1, 1, 1), material);\n";
+                        break;
+                    case 3:
+                        document.getElementById("codeview2").value += "object3d = new THREE.Mesh(new THREE.CylinderGeometry(0, 1, 2, 32), material);\n";
+                        break;
+                    case 4:
+                        document.getElementById("codeview2").value += "object3d = new THREE.Mesh(new THREE.TorusGeometry(1, 0.35, 16, 20), material);\n";
+                        break;
+                    case 5:
+                        document.getElementById("codeview2").value += "object3d = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 0), material);\n";
+                        break;
+                    case 6:
+                        document.getElementById("codeview2").value += "object3d = new THREE.Mesh(new THREE.TeapotGeometry(0.75, 10), material);\n";
+                        break;
+                }
+                document.getElementById("codeview2").value += "object3d.overdraw = true;\n\
+scene.add(object3d);\n\
+\n\
+";
+                document.getElementById("codeview2").value +="object3d.position.set( "+ posx +", "+ posy +", "+ updown+");\n\
+\n\
+";
+                document.getElementById("codeview2").value +="object3d.scale.set(" + skalx +", " + skaly + ", " + skalz + ");\n\
+\n\
+";
+                if (wybrot > 0) {
+                    switch (wybrot) {
+                        case 1:
+                            document.getElementById("codeview2").value += "object3d.rotation.x = " + rotacjax +";\n\
+\n\
+";
+                            break;
+                        case 2:
+                            document.getElementById("codeview2").value += "object3d.rotation.y = " + rotacjay +";\n\
+\n\
+";
+                            break;
+                        case 3:
+                            document.getElementById("codeview2").value += "object3d.rotation.z = " + rotacjaz +";\n\
+\n\
+";
+                            break;
+                        case 4:
+                            document.getElementById("codeview2").value += "object3d.rotation.x = " + rotacjax +";\n\
+object3d.rotation.y = " + rotacjay +";\n\
+\n\
+";
+                            break;
+                        case 5:
+                            document.getElementById("codeview2").value += "object3d.rotation.x = " + rotacjax +";\n\
+object3d.rotation.z = " + rotacjaz +";\n\
+\n\
+";
+                            break;
+                        case 6:
+                            document.getElementById("codeview2").value += "object3d.rotation.y = " + rotacjay +";\n\
+object3d.rotation.z = " + rotacjaz +";\n\
+\n\
+";
+                            break;
+                        case 7:
+                            document.getElementById("codeview2").value += "object3d.rotation.x = " + rotacjax +";\n\
+object3d.rotation.y = " + rotacjay +";\n\
+object3d.rotation.z = " + rotacjaz +";\n\
+\n\
+";
+                            break;
+
+                    }
+                }
+                
+                document.getElementById("codeview2").value += "renderer.render(scene, camera);\n\
+\n\
+";
+                document.getElementById("znaki").value = document.getElementById("codeview2").value.length;
+                document.getElementById("linie").value = document.getElementById("codeview2").value.split("\n").length - 2;
+            }
+            function initializeScene() {
+
+                if (Detector.webgl) {
+                    renderer = new THREE.WebGLRenderer({antialias: true});
+                } else {
+                    renderer = new THREE.CanvasRenderer();
+                }
+
+                renderer.setClearColor(0x000000, 1);
+
+                canvasWidth = 500;
+                canvasHeight = 500;
+
+                renderer.setSize(canvasWidth, canvasHeight);
+                document.getElementById("WebGLCanvas").appendChild(renderer.domElement);
+
+            }
+
+            function renderScene() {
+                scene = new THREE.Scene();
+
+                camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 0.1, 100);
+                camera.position.set(0, 0, 5);
+                camera.lookAt(scene.position);
+                scene.add(camera);
+
+                if (swiatlo == 1) {
+                    var ambientLight = new THREE.AmbientLight(0x101010, 1.0);
+                    scene.add(ambientLight);
+
+                    var directionalLight = new THREE.DirectionalLight(0xfffff7, 1);
+                    directionalLight.position.set(1, 1, 5);
+                    scene.add(directionalLight);
+
+                    var material = new THREE.MeshLambertMaterial({
+                        color: "rgb(" + w1aa + "," + w1bb + "," + w1cc + ")",
+                        side: THREE.DoubleSide
+                    });
+                } else if (swiatlo == 2) {
+                    var material = new THREE.MeshBasicMaterial({
+                        color: "rgb(" + w1aa + "," + w1bb + "," + w1cc + ")",
+                        side: THREE.DoubleSide
+                    });
+                }
+
+                switch (figura) {
+                    case 1:
+                        object3d = new THREE.Mesh(new THREE.SphereGeometry(1, 24, 24), material);
+                        break;
+                    case 2:
+                        object3d = new THREE.Mesh(new THREE.CubeGeometry(1.5, 1.5, 1.5, 1, 1, 1), material);
+                        break;
+                    case 3:
+                        object3d = new THREE.Mesh(new THREE.CylinderGeometry(0, 1, 2, 32), material);
+                        break;
+                    case 4:
+                        object3d = new THREE.Mesh(new THREE.TorusGeometry(1, 0.35, 16, 20), material);
+                        break;
+                    case 5:
+                        object3d = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 0), material);
+                        break;
+                    case 6:
+                        object3d = new THREE.Mesh(new THREE.TeapotGeometry(0.75, 10), material);
+                        break;
+                }
+                object3d.overdraw = true;
+                scene.add(object3d);
+                object3d.position.set(posx, posy, updown);
+                object3d.scale.set(skalx, skaly, skalz);
+                if (wybrot > 0) {
+                    switch (wybrot) {
+                        case 1:
+                            object3d.rotation.x = rotacjax;
+                            break;
+                        case 2:
+                            object3d.rotation.y = rotacjay;
+                            break;
+                        case 3:
+                            object3d.rotation.z = rotacjaz;
+                            break;
+                        case 4:
+                            object3d.rotation.x = rotacjax;
+                            object3d.rotation.y = rotacjay;
+                            break;
+                        case 5:
+                            object3d.rotation.x = rotacjax;
+                            object3d.rotation.z = rotacjaz;
+                            break;
+                        case 6:
+                            object3d.rotation.y = rotacjay;
+                            object3d.rotation.z = rotacjaz;
+                            break;
+                        case 7:
+                            object3d.rotation.x = rotacjax;
+                            object3d.rotation.y = rotacjay;
+                            object3d.rotation.z = rotacjaz;
+                            break;
+
+                    }
+                }
+                
+                renderer.render(scene, camera);
+            }
+            var frameCount = 0;
+            var lastTime = 0;
+
+            function liczfps() {
+                frameCount++;
+                var timeNow = new Date().getTime();
+                var elapsed = timeNow - lastTime;
+                if (elapsed > 100) {
+                    document.getElementById("fps").value = frameCount / (elapsed / 1000.0);
+                    lastTime = timeNow;
+                    frameCount = 0;
+                }
+                return fps;
+            }
+
+            function animateScene() {
+                requestAnimationFrame(animateScene);
+                renderScene();
+                liczfps();
+            }
+            function start() {
+                figura = 1;
+                swiatlo = 1;
+                w1aa = 255;
+                w1bb = 255;
+                w1cc = 255;
+                rotacjax = 0;
+                rotacjay = 0;
+                rotacjaz = 0;
+                posx = 0;
+                posy = 0;
+                updown = 0;
+                skalx = 1;
+                skaly = 1;
+                skalz = 1;
+                wypelnij();
+                
+                initializeScene();
+                animateScene();
+
+
+
+            }
+        </script>
+    </head>
+    <body onload="start();">
+        <table border="0">
+            <thead>
+                <tr>
+                    <th style=" color: black; height: 30px; width: 1196px; text-align: left;  background: -webkit-gradient(linear, left top, left bottom, from(#81a8cb), to(#4477a1) ); background: -moz-linear-gradient(-90deg, #81a8cb, #4477a1)">
+                        &nbsp;&nbsp;&nbsp; JavaScript & WebGL: Przekształcenia
+
+                    </th>
+                    <th style="color: black; height: 30px; width: 40px; text-align: center; background: -webkit-gradient(linear, left top, left bottom, from(#81a8cb), to(#4477a1) ); background: -moz-linear-gradient(-90deg, #81a8cb, #4477a1)">
+                        <a href="info.html"><img src="Data/info.png" width="35" height="35" alt=""/></a>
+                    </th>
+                    <th style="color: black; height: 30px; width: 40px; text-align: center; background: -webkit-gradient(linear, left top, left bottom, from(#81a8cb), to(#4477a1) ); background: -moz-linear-gradient(-90deg, #81a8cb, #4477a1)">
+                        <a href="index.html"><img src="Data/home.png" width="35" height="35" alt=""/></a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <th style="background-color: ghostwhite; height: 500px; width: 500px; text-align: center">
+                        <!--                      //  <canvas id="WebGLPanel" style="border: none;" width="500" height="500"></canvas>        -->
+            <div id="WebGLCanvas"></div>
+        </th>
+        <th style="background-color: ghostwhite; height: 500px; width: 780px; text-align: center">
+            <textarea style="overflow:auto;resize:none;background-color: black; color: chartreuse" name="codeview2" rows="28" cols="95" id="codeview2" readonly>
+            </textarea>
+            <br>
+            <label>Ilość wierszy: </label>
+            <input readonly id="linie">&nbsp; &nbsp; &nbsp; &nbsp; 
+            <label>Ilość znaków: </label>
+            <input readonly id="znaki">&nbsp; &nbsp; &nbsp; &nbsp; 
+            <label>FPS: </label>
+            <input readonly id="fps">
+        </th>
+    </tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<table>
+    <thead>
+        <tr>
+            <th style="background-color: ghostwhite; height: 100px; width: 500px; text-align: center">
+                <input style="height: 40px; width: 150px" onclick="buton1();" type="submit" value="SFERA" name="jeden" id="button1" />
+                <input style="height: 40px; width: 150px" onclick="buton2();" type="submit" value="SZEŚCIAN" name="jeden" id="button2"/>
+                <input style="height: 40px; width: 150px" onclick="buton3();" type="submit" value="STOŻEK" name="jeden" id="button3"/><br><br>
+                <input style="height: 40px; width: 150px" onclick="buton4();" type="submit" value="TORUS" name="jeden" id="button4"/>
+                <input style="height: 40px; width: 150px" onclick="buton5();" type="submit" value="DWUDZIESTOŚCIAN" name="jeden" id="button5"/>
+                <input style="height: 40px; width: 150px" onclick="buton6();" type="submit" value="CZAJNIK" name="jeden" id="button6"/>
+
+            </th>
+            <th style="background-color: ghostwhite; height: 100px; width: 780px; text-align: left">
+    <table border="0" cellpadding="10">
+        <thead>
+            <tr>
+                <th align="left">
+                    &nbsp;<label>Rotacja: </label>
+                    <input type="checkbox" name="Oś X"  id="osx" onchange="wybrotacji();"/><label for="osx">Oś X</label>
+                    <input type="checkbox" name="Oś Y"  id="osy" onchange="wybrotacji();"/><label for="osx">Oś Y</label>
+                    <input type="checkbox" name="Oś Z"  id="osz" onchange="wybrotacji();"/><label for="osx">Oś Z</label>&nbsp;&nbsp;&nbsp;<br><br>
+                    &nbsp; <label>Kąt obrotu (X): </label>&nbsp; &nbsp; &nbsp; &nbsp;<input style="width: 60px" step="1" min="0" max="360" value="0" type="number" id="rx" onchange="rotx();"><br><br>
+                    &nbsp; <label>Kąt obrotu (Y): </label>&nbsp; &nbsp; &nbsp; &nbsp;<input style="width: 60px" step="1" min="0" max="360" value="0" type="number" id="ry" onchange="roty();"><br><br>
+                    &nbsp; <label>Kąt obrotu (Z): </label>&nbsp; &nbsp; &nbsp; &nbsp;<input style="width: 60px" step="1" min="0" max="360" value="0" type="number" id="rz" onchange="rotz();">
+                </th>
+                <th>
+                    &nbsp; <label>Translacja: </label><br><br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input style="width: 27px; height: 37px; font-size: 12px" onclick="posdown();" type="submit" value="↑" id="posup"/>&nbsp;<input style="width: 27px; height: 27px; font-size: 12px" onclick="zoomin();" type="submit" value="-" id="zoomin"/><br>
+                    <input style="width: 37px; height: 27px; font-size: 12px" onclick="posright();" type="submit" value="←" id="posleft"/>
+                    <input style="width: 27px; height: 27px; font-size: 12px" onclick="posreset();" type="submit" value="X" id="posreset"/>
+                    <input style="width: 37px; height: 27px; font-size: 12px" onclick="posleft();" type="submit" value="→" id="posright"/><br>&nbsp;<input style="width: 27px; height: 27px; font-size: 12px" onclick="zoomout();" type="submit" value="+" id="zoomout"/>
+                    <input style="width: 27px; height: 37px; font-size: 12px" onclick="posup();" type="submit" value="↓" id="posdown"/>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                </th>
+                <th>
+                     &nbsp; <label>Skalowanie: </label><br><br>
+                    &nbsp;<input style="width: 37px; height: 20px; font-size: 12px" onclick="scalex1();" type="submit" value="-" id="scalex1"/> Oś X
+                    &nbsp;<input style="width: 37px; height: 20px; font-size: 12px" onclick="scalex2();" type="submit" value="+" id="scalex2"/><br><br>
+                    &nbsp;<input style="width: 37px; height: 20px; font-size: 12px" onclick="scaley1();" type="submit" value="-" id="scaley1"/> Oś Y
+                    &nbsp;<input style="width: 37px; height: 20px; font-size: 12px" onclick="scaley2();" type="submit" value="+" id="scaley2"/><br><br>
+                    &nbsp;<input style="width: 37px; height: 20px; font-size: 12px" onclick="scalez1();" type="submit" value="-" id="scalez1"/> Oś Z
+                    &nbsp;<input style="width: 37px; height: 20px; font-size: 12px" onclick="scalez2();" type="submit" value="+" id="scalez2"/>
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+    <table border="0" cellpadding="10">
+        <thead>
+            <tr>
+                <th>
+                    &nbsp; <label>Kolor: </label>&nbsp; &nbsp;<input style="width: 60px" step="1" min="0" max="255" value="255" type="number" id="w1a" onchange="w1a();">&nbsp;&nbsp;<input style="width: 60px" step="1" min="0" max="255" value="255" type="number" id="w1b" onchange="w1b();">&nbsp;&nbsp;<input style="width: 60px" step="1" min="0" max="255" value="255" type="number" id="w1c" onchange="w1c();" >
+                </th>
+                <th> &nbsp; &nbsp; <label>Światło: </label>
+                    &nbsp; &nbsp; <input type="radio" name="figura" id="figura1" value="" checked="checked" onchange="buton7();"/><label for="figura1">ON</label>
+                    &nbsp; &nbsp; <input type="radio" name="figura" id="figura2" value="" onchange="buton8();"/><label for="figura1">OFF</label></th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<table style=" color: black; height: 5px; width: 1290px; text-align: left;  background: -webkit-gradient(linear, left top, left bottom, from(#81a8cb), to(#4477a1) ); background: -moz-linear-gradient(-90deg, #81a8cb, #4477a1)">
+    <thead>
+        <tr>
+            <th></th>
+        </tr>
+    </thead>
+</table>
+</body>
+</html>
+

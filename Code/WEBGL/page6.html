@@ -1,0 +1,764 @@
+﻿<html>
+    <head>
+        <title>JavaScript & WebGL: Kamera i poruszanie się po scenie 3D</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1">
+        <script type="text/javascript" src="three.min.js"></script>
+        <script type="text/javascript" src="Detector.js"></script>
+        <script type="text/javascript" src="uclass_TeapotGeometry.js"></script>
+        <script>
+
+            var scene;
+            var camera;
+            var matpodloga;
+            var matscian;
+            var matsufit;
+            var Tekstura1;
+            var Tekstura2;
+            var Tekstura3;
+
+            var sufit;
+            var podloga;
+            var spo1;
+            var spo2;
+            var spo3;
+            var spo4;
+            var spo5;
+            var spo6;
+            var spo7;
+            var spo8;
+            var spo9;
+            var spo10;
+            var spo11;
+            var spo12;
+            var spi1;
+            var spi2;
+            var spi3;
+            var spi4;
+            var spi5;
+            var spi6;
+            var spi7;
+            var spi8;
+            var spi9;
+            var spi10;
+
+            var X;
+            var Y;
+            var Z;
+            var HM;
+
+
+            var swiatlo;
+            var blend;
+            var kolizje;
+
+            var material;
+            var pa;
+            var pw;
+            var ps;
+            var pd;
+            var pq;
+            var pe;
+            var tablica = [
+                //poziom
+                [-18, 18, 18, 18],
+                [-6, 14, 14, 14],
+                [14, 18, 10, 10],
+                [-10, 10, 10, 10],
+                [-14, 10, 6, 6],
+                [-10, 14, 2, 2],
+                [10, 14, -2, -2],
+                [-10, 6, -2, -2],
+                [-14, 6, -6, -6],
+                [-18, 6, -10, -10],
+                [10, 18, -10, -10],
+                [2, 14, -18, -18],
+                //pion
+                [18, 18, -10, 18],
+                [14, 14, 2, 14],
+                [14, 14, -6, -2],
+                [14, 14, -18, -10],
+                [10, 10, -10, -2],
+                [6, 6, -10, -6],
+                [2, 2, -18, -10],
+                [-10, -10, -2, 2],
+                [-10, -10, 10, 18],
+                [-14, -14, -6, 14],
+                [-18, -18, -10, 18],
+                //test
+                [-1, -1, -1, -1]
+            ];
+            var g;
+            function keyup(evt) {
+                //w
+                if (evt.keyCode == 87) {
+
+                    pw = 1;
+                }
+                //s
+                if (evt.keyCode == 83) {
+                    ps = 1;
+                }
+                //a
+                if (evt.keyCode == 65) {
+                    pa = 1;
+                }
+                //d
+                if (evt.keyCode == 68) {
+                    pd = 1;
+                }
+                if (evt.keyCode == 81) {
+                    pq = 1;
+                }
+                if (evt.keyCode == 69) {
+                    pe = 1;
+                }
+            }
+            function keydown(evt) {
+                //w
+                if (evt.keyCode == 87) {
+                    pw = 2;
+                }
+                //s
+                if (evt.keyCode == 83) {
+                    ps = 2;
+                }
+                //a
+                if (evt.keyCode == 65) {
+                    pa = 2;
+                }
+                //d
+                if (evt.keyCode == 68) {
+                    pd = 2;
+                }
+                if (evt.keyCode == 81) {
+                    pq = 2;
+                }
+                if (evt.keyCode == 69) {
+                    pe = 2;
+                }
+
+            }
+
+
+            function detekcjakolizji(koli) {
+                var SX = X;
+                var SZ = Z;
+
+                if (pa == 2) {
+                    X -= 0.1 * Math.sin(R + (90 * Math.PI / 180));
+                    Z += 0.1 * Math.cos(R + (90 * Math.PI / 180));
+                    wypelnij();
+                }
+                if (pd == 2) {
+                    X += 0.1 * Math.sin(R + (90 * Math.PI / 180));
+                    Z -= 0.1 * Math.cos(R + (90 * Math.PI / 180));
+                    wypelnij();
+                }
+                if (pe == 2) {
+                    R += 0.02;
+                    wypelnij();
+                }
+                if (pq == 2) {
+                    R -= 0.02;
+                    wypelnij();
+                }
+                if (ps == 2) {
+                    X -= 0.1 * Math.sin(R);
+                    Z += 0.1 * Math.cos(R);
+                    HM += 2;
+                    Y = 0.1 * Math.sin(HM * 0.1);
+                    wypelnij();
+                }
+                if (pw == 2) {
+                    X += 0.1 * Math.sin(R);
+                    Z -= 0.1 * Math.cos(R);
+                    HM -= 2;
+                    Y = 0.1 * Math.sin(HM * 0.1);
+                    wypelnij();
+                }
+                if (koli == 1) {
+                    for (a = 0; tablica[a][0] != -1; a++)
+                    {
+                        if (tablica[a][0] != tablica[a][1])
+                        {
+                            if (X > tablica[a][0] - g && X < tablica[a][1] + g)
+                            {
+                                if (Z > (tablica[a][2] - g) && Z < (tablica[a][3] + g))
+                                {
+                                    X = SX;
+                                    Z = SZ;
+                                    wypelnij();
+                                }
+                            }
+                        } else {
+                            if (Z > tablica[a][2] - g && Z < tablica[a][3] + g)
+                            {
+                                if (X > (tablica[a][0] - g) && X < (tablica[a][1] + g))
+                                {
+                                    X = SX;
+                                    Z = SZ;
+                                    wypelnij();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            function swiatlo1() {
+                swiatlo = 1;
+                wypelnij();
+            }
+            function swiatlo2() {
+                swiatlo = 2;
+                wypelnij();
+            }
+
+            function blend1() {
+                blend = 1;
+                wypelnij();
+            }
+            function blend2() {
+                blend = 2;
+                wypelnij();
+            }
+            function kolizje1() {
+                kolizje = 1;
+                wypelnij();
+            }
+            function kolizje2() {
+                kolizje = 2;
+                wypelnij();
+            }
+
+
+
+            function wypelnij() {
+                document.getElementById("codeview2").value = "scene = new THREE.Scene();\n\
+\n\
+camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 0.1, 100);\n\
+\n\
+";
+                if (kolizje == 1) {
+                    document.getElementById("codeview2").value += "DetekcjaKolizji();\n\
+\n\
+";
+                }
+                document.getElementById("codeview2").value += "camera.position.set(" + X + ", " + Y + ", " + Z + ");\n\
+camera.up = new THREE.Vector3(0, 1, 0);\n\
+camera.lookAt(new THREE.Vector3( " + (X + Math.sin(R)) + ", " + Y + ", " + (Z - Math.cos(R)) + "));\n\
+scene.add(camera);\n\
+\n\
+"
+                if (swiatlo == 1) {
+                    document.getElementById("codeview2").value += "var ambientLight = new THREE.AmbientLight(0x101010, 1.0);\n\
+scene.add(ambientLight);\n\
+\n\
+var hemiLight = new THREE.HemisphereLight(0xfffff7, 0xfffff7, 0.6);\n\
+hemiLight.color.setHSL(1, 1, 1);\n\
+hemiLight.groundColor.setHSL(1, 1, 1);\n\
+hemiLight.position.set(0, 500, 0);\n\
+scene.add(hemiLight);\n\
+\n\
+var directionalLight = new THREE.DirectionalLight(0xfffff7, 0.6);\n\
+directionalLight.position.set(100, 2, 100);\n\
+scene.add(directionalLight);\n\
+\n\
+var directionalLight2 = new THREE.DirectionalLight(0xfffff7, 0.3);\n\
+directionalLight2.position.set(-100, -2, -100);\n\
+scene.add(directionalLight2);\n\
+\n\
+matpodloga = new THREE.MeshLambertMaterial({\n\
+\tmap: Tekstura1,\n\
+\ttransparent: true,\n\
+\tside: THREE.DoubleSide\n\
+\t});\n\
+\n\
+matsufit = new THREE.MeshLambertMaterial({\n\
+\tmap: Tekstura2,\n\
+\ttransparent: true,\n\
+\tside: THREE.DoubleSide\n\
+\t});\n\
+\n\
+matscian = new THREE.MeshLambertMaterial({\n\
+\tmap: Tekstura3,\n\
+\ttransparent: true,\n\
+\tside: THREE.DoubleSide\n\
+\t});\n\
+\n\
+";
+                } else if (swiatlo == 2) {
+                    document.getElementById("codeview2").value += "matpodloga = new THREE.MeshBasicMaterial({\n\
+\tmap: Tekstura1,\n\
+\ttransparent: true,\n\
+\tside: THREE.DoubleSide\n\
+\t});\n\
+\n\
+matsufit = new THREE.MeshBasicMaterial({\n\
+\tmap: Tekstura2,\n\
+\ttransparent: true,\n\
+\tside: THREE.DoubleSide\n\
+\t});\n\
+\n\
+matscian = new THREE.MeshBasicMaterial({\n\
+\tmap: Tekstura3,\n\
+\ttransparent: true,\n\
+\tside: THREE.DoubleSide\n\
+\t});\n\
+\n\
+";
+                }
+                if (blend == 1) {
+                    document.getElementById("codeview2").value += "matpodloga.depthWrite = false;\n\
+matpodloga.opacity = 0.5;\n\
+matpodloga.combine = THREE.MixOperation;\n\
+\n\
+matscian.depthWrite = false;\n\
+matscian.opacity = 0.5;\n\
+matscian.combine = THREE.MixOperation;\n\
+\n\
+matsufit.depthWrite = false;\n\
+matsufit.opacity = 0.5;\n\
+matsufit.combine = THREE.MixOperation;\n\
+\n\
+";
+                } else if (blend == 2) {
+                    document.getElementById("codeview2").value += "matpodloga.depthWrite = true;\n\
+matpodloga.opacity = 1.0;\n\
+matpodloga.combine = THREE.MultiplyOperation;\n\
+\n\
+matscian.depthWrite = true;\n\
+matscian.opacity = 1.0;\n\
+matscian.combine = THREE.MultiplyOperation;\n\
+\n\
+matsufit.depthWrite = true;\n\
+matsufit.opacity = 1.0;\n\
+matsufit.combine = THREE.MultiplyOperation;\n\
+\n\
+";
+                }
+
+                document.getElementById("codeview2").value += "\tStworzenie_swiata();\n\
+         \n\
+";
+                document.getElementById("codeview2").value += "renderer.render(scene, camera);\n\
+\n\
+";
+
+                document.getElementById("znaki").value = document.getElementById("codeview2").value.length;
+                document.getElementById("linie").value = document.getElementById("codeview2").value.split("\n").length - 2;
+            }
+
+            function Stworzenie_swiata() {
+                podloga = new THREE.Mesh(new THREE.PlaneGeometry(36, 36, 1, 1), matpodloga);
+                podloga.overdraw = true;
+                podloga.position.set(0, -2, 0);
+                podloga.rotation.x = 90 * Math.PI / 180;
+                scene.add(podloga);
+
+                sufit = new THREE.Mesh(new THREE.PlaneGeometry(36, 36, 1, 1), matsufit);
+                sufit.overdraw = true;
+                sufit.position.set(0, 2, 0);
+                sufit.rotation.x = 90 * Math.PI / 180;
+                scene.add(sufit);
+
+                spo1 = new THREE.Mesh(new THREE.PlaneGeometry(36, 4, 1, 1), matscian);
+                spo1.overdraw = true;
+                spo1.position.set(0, 0, 18);
+                scene.add(spo1);
+
+                spo2 = new THREE.Mesh(new THREE.PlaneGeometry(20, 4, 1, 1), matscian);
+                spo2.overdraw = true;
+                spo2.position.set(4, 0, 14);
+                scene.add(spo2);
+
+                spo3 = new THREE.Mesh(new THREE.PlaneGeometry(4, 4, 1, 1), matscian);
+                spo3.overdraw = true;
+                spo3.position.set(16, 0, 10);
+                scene.add(spo3);
+
+                spo4 = new THREE.Mesh(new THREE.PlaneGeometry(20, 4, 1, 1), matscian);
+                spo4.overdraw = true;
+                spo4.position.set(0, 0, 10);
+                scene.add(spo4);
+
+                spo5 = new THREE.Mesh(new THREE.PlaneGeometry(24, 4, 1, 1), matscian);
+                spo5.overdraw = true;
+                spo5.position.set(-2, 0, 6);
+                scene.add(spo5);
+
+                spo6 = new THREE.Mesh(new THREE.PlaneGeometry(24, 4, 1, 1), matscian);
+                spo6.overdraw = true;
+                spo6.position.set(2, 0, 2);
+                scene.add(spo6);
+
+                spo7 = new THREE.Mesh(new THREE.PlaneGeometry(16, 4, 1, 1), matscian);
+                spo7.overdraw = true;
+                spo7.position.set(-2, 0, -2);
+                scene.add(spo7);
+
+                spo8 = new THREE.Mesh(new THREE.PlaneGeometry(4, 4, 1, 1), matscian);
+                spo8.overdraw = true;
+                spo8.position.set(12, 0, -2);
+                scene.add(spo8);
+
+                spo9 = new THREE.Mesh(new THREE.PlaneGeometry(20, 4, 1, 1), matscian);
+                spo9.overdraw = true;
+                spo9.position.set(-4, 0, -6);
+                scene.add(spo9);
+
+                spo10 = new THREE.Mesh(new THREE.PlaneGeometry(24, 4, 1, 1), matscian);
+                spo10.overdraw = true;
+                spo10.position.set(-6, 0, -10);
+                scene.add(spo10);
+
+                spo11 = new THREE.Mesh(new THREE.PlaneGeometry(8, 4, 1, 1), matscian);
+                spo11.overdraw = true;
+                spo11.position.set(14, 0, -10);
+                scene.add(spo11);
+
+                spo12 = new THREE.Mesh(new THREE.PlaneGeometry(12, 4, 1, 1), matscian);
+                spo12.overdraw = true;
+                spo12.position.set(8, 0, -18);
+                scene.add(spo12);
+
+
+                spi1 = new THREE.Mesh(new THREE.PlaneGeometry(28, 4, 1, 1), matscian);
+                spi1.overdraw = true;
+                spi1.position.set(18, 0, 4);
+                spi1.rotation.y = 90 * Math.PI / 180;
+                scene.add(spi1);
+
+                spi2 = new THREE.Mesh(new THREE.PlaneGeometry(12, 4, 1, 1), matscian);
+                spi2.overdraw = true;
+                spi2.position.set(14, 0, 8);
+                spi2.rotation.y = 90 * Math.PI / 180;
+                scene.add(spi2);
+
+                spi3 = new THREE.Mesh(new THREE.PlaneGeometry(4, 4, 1, 1), matscian);
+                spi3.overdraw = true;
+                spi3.position.set(14, 0, -4);
+                spi3.rotation.y = 90 * Math.PI / 180;
+                scene.add(spi3);
+
+                spi4 = new THREE.Mesh(new THREE.PlaneGeometry(8, 4, 1, 1), matscian);
+                spi4.overdraw = true;
+                spi4.position.set(14, 0, -14);
+                spi4.rotation.y = 90 * Math.PI / 180;
+                scene.add(spi4);
+
+                spi5 = new THREE.Mesh(new THREE.PlaneGeometry(8, 4, 1, 1), matscian);
+                spi5.overdraw = true;
+                spi5.position.set(10, 0, -6);
+                spi5.rotation.y = 90 * Math.PI / 180;
+                scene.add(spi5);
+
+                spi6 = new THREE.Mesh(new THREE.PlaneGeometry(4, 4, 1, 1), matscian);
+                spi6.overdraw = true;
+                spi6.position.set(6, 0, -8);
+                spi6.rotation.y = 90 * Math.PI / 180;
+                scene.add(spi6);
+
+                spi7 = new THREE.Mesh(new THREE.PlaneGeometry(8, 4, 1, 1), matscian);
+                spi7.overdraw = true;
+                spi7.position.set(2, 0, -14);
+                spi7.rotation.y = 90 * Math.PI / 180;
+                scene.add(spi7);
+
+                spi8 = new THREE.Mesh(new THREE.PlaneGeometry(8, 4, 1, 1), matscian);
+                spi8.overdraw = true;
+                spi8.position.set(-10, 0, 14);
+                spi8.rotation.y = 90 * Math.PI / 180;
+                scene.add(spi8);
+
+                spi9 = new THREE.Mesh(new THREE.PlaneGeometry(20, 4, 1, 1), matscian);
+                spi9.overdraw = true;
+                spi9.position.set(-14, 0, 4);
+                spi9.rotation.y = 90 * Math.PI / 180;
+                scene.add(spi9);
+
+                spi10 = new THREE.Mesh(new THREE.PlaneGeometry(28, 4, 1, 1), matscian);
+                spi10.overdraw = true;
+                spi10.position.set(-18, 0, 4);
+                spi10.rotation.y = 90 * Math.PI / 180;
+                scene.add(spi10);
+
+                spi11 = new THREE.Mesh(new THREE.PlaneGeometry(4, 4, 1, 1), matscian);
+                spi11.overdraw = true;
+                spi11.position.set(-10, 0, 0);
+                spi11.rotation.y = 90 * Math.PI / 180;
+                scene.add(spi11);
+            }
+            function initializeScene() {
+
+                if (Detector.webgl) {
+                    renderer = new THREE.WebGLRenderer({antialias: true});
+                } else {
+                    renderer = new THREE.CanvasRenderer();
+                }
+
+                renderer.setClearColor(0x000000, 1);
+                canvasWidth = 500;
+                canvasHeight = 500;
+                renderer.setSize(canvasWidth, canvasHeight);
+                document.getElementById("WebGLCanvas").appendChild(renderer.domElement);
+                renderer.gammaInput = true;
+                renderer.gammaOutput = true;
+                renderer.shadowMapEnabled = true;
+                renderer.shadowMapCullFace = THREE.CullFaceBack;
+
+                Tekstura1 = new THREE.ImageUtils.loadTexture("Data/podloga.jpg");
+                Tekstura1.wrapS = THREE.RepeatWrapping;
+                Tekstura1.wrapT = THREE.RepeatWrapping;
+                Tekstura1.repeat.set(36, 36);
+                Tekstura2 = new THREE.ImageUtils.loadTexture("Data/sufit.jpg");
+                Tekstura2.wrapS = THREE.RepeatWrapping;
+                Tekstura2.wrapT = THREE.RepeatWrapping;
+                Tekstura2.repeat.set(36, 36);
+                Tekstura3 = new THREE.ImageUtils.loadTexture("Data/sciany.jpg");
+                Tekstura3.wrapS = THREE.RepeatWrapping;
+                Tekstura3.wrapT = THREE.RepeatWrapping;
+                Tekstura3.repeat.set(9, 3);
+            }
+
+            function renderScene() {
+                scene = new THREE.Scene();
+                camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 0.1, 100);
+
+                detekcjakolizji(kolizje);
+
+                camera.position.set(X, Y, Z);
+                camera.up = new THREE.Vector3(0, 1, 0);
+                camera.lookAt(new THREE.Vector3(X + Math.sin(R), Y, Z - Math.cos(R)));
+                scene.add(camera);
+
+                if (swiatlo == 1) {
+                    var ambientLight = new THREE.AmbientLight(0x101010, 1.0);
+                    scene.add(ambientLight);
+
+                    var hemiLight = new THREE.HemisphereLight(0xfffff7, 0xfffff7, 0.6);
+                    hemiLight.color.setHSL(1, 1, 1);
+                    hemiLight.groundColor.setHSL(1, 1, 1);
+                    hemiLight.position.set(0, 500, 0);
+                    scene.add(hemiLight);
+
+                    var directionalLight = new THREE.DirectionalLight(0xfffff7, 0.6);
+                    directionalLight.position.set(100, 2, 100);
+                    scene.add(directionalLight);
+
+                    var directionalLight2 = new THREE.DirectionalLight(0xfffff7, 0.3);
+                    directionalLight2.position.set(-100, -2, -100);
+                    scene.add(directionalLight2);
+
+
+                    matpodloga = new THREE.MeshLambertMaterial({
+                        map: Tekstura1,
+                        transparent: true,
+                        side: THREE.DoubleSide
+                    });
+
+                    matscian = new THREE.MeshLambertMaterial({
+                        map: Tekstura3,
+                        transparent: true,
+                        side: THREE.DoubleSide
+                    });
+
+                    matsufit = new THREE.MeshLambertMaterial({
+                        map: Tekstura2,
+                        transparent: true,
+                        side: THREE.DoubleSide
+                    });
+
+                } else if (swiatlo == 2) {
+
+                    matpodloga = new THREE.MeshBasicMaterial({
+                        map: Tekstura1,
+                        transparent: true,
+                        side: THREE.DoubleSide
+                    });
+
+                    matscian = new THREE.MeshBasicMaterial({
+                        map: Tekstura3,
+                        transparent: true,
+                        side: THREE.DoubleSide
+                    });
+
+                    matsufit = new THREE.MeshBasicMaterial({
+                        map: Tekstura2,
+                        transparent: true,
+                        side: THREE.DoubleSide
+                    });
+
+                }
+                if (blend == 1) {
+                    matpodloga.depthWrite = false;
+                    matpodloga.opacity = 0.5;
+                    matpodloga.combine = THREE.MixOperation;
+
+                    matscian.depthWrite = false;
+                    matscian.opacity = 0.5;
+                    matscian.combine = THREE.MixOperation;
+
+                    matsufit.depthWrite = false;
+                    matsufit.opacity = 0.5;
+                    matsufit.combine = THREE.MixOperation;
+                } else if (blend == 2) {
+                    matpodloga.depthWrite = true;
+                    matpodloga.opacity = 1.0;
+                    matpodloga.combine = THREE.MultiplyOperation;
+
+                    matscian.depthWrite = true;
+                    matscian.opacity = 1.0;
+                    matscian.combine = THREE.MultiplyOperation;
+
+                    matsufit.depthWrite = true;
+                    matsufit.opacity = 1.0;
+                    matsufit.combine = THREE.MultiplyOperation;
+                }
+                Stworzenie_swiata();
+
+                renderer.render(scene, camera);
+            }
+            var frameCount = 0;
+            var lastTime = 0;
+            function liczfps() {
+                frameCount++;
+                var timeNow = new Date().getTime();
+                var elapsed = timeNow - lastTime;
+                if (elapsed > 100) {
+                    document.getElementById("fps").value = frameCount / (elapsed / 1000.0);
+                    lastTime = timeNow;
+                    frameCount = 0;
+                }
+                return fps;
+            }
+
+            function animateScene() {
+                requestAnimationFrame(animateScene);
+                renderScene();
+                liczfps();
+            }
+            function start() {
+                tekstura = 1;
+                swiatlo = 1;
+                blend = 2;
+                kolizje = 1;
+                X = 0;
+                Y = 0;
+                Z = 16;
+                R = 0;
+                g = 0.2;
+                HM = 0;
+                pa = 1;
+                pw = 1;
+                ps = 1;
+                pd = 1;
+                pq = 1;
+                pe = 1;
+                wypelnij();
+                initializeScene();
+
+                animateScene();
+
+
+            }
+        </script>
+    </head>
+    <body onkeyup="keyup(event);" onkeydown="keydown(event);" onload="start();" >
+        <table border="0">
+            <thead>
+                <tr>
+                    <th style=" color: black; height: 30px; width: 1196px; text-align: left;  background: -webkit-gradient(linear, left top, left bottom, from(#81a8cb), to(#4477a1) ); background: -moz-linear-gradient(-90deg, #81a8cb, #4477a1)">
+                        &nbsp;&nbsp;&nbsp; JavaScript & WebGL: Kamera i poruszanie się po scenie 3D
+
+                    </th>
+                    <th style="color: black; height: 30px; width: 40px; text-align: center; background: -webkit-gradient(linear, left top, left bottom, from(#81a8cb), to(#4477a1) ); background: -moz-linear-gradient(-90deg, #81a8cb, #4477a1)">
+                        <a href="info.html"><img src="Data/info.png" width="35" height="35" alt=""/></a>
+                    </th>
+                    <th style="color: black; height: 30px; width: 40px; text-align: center; background: -webkit-gradient(linear, left top, left bottom, from(#81a8cb), to(#4477a1) ); background: -moz-linear-gradient(-90deg, #81a8cb, #4477a1)">
+                        <a href="index.html"><img src="Data/home.png" width="35" height="35" alt=""/></a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <th style="background-color: ghostwhite; height: 500px; width: 500px; text-align: center">
+                        <!--                      //  <canvas id="WebGLPanel" style="border: none;" width="500" height="500"></canvas>        -->
+            <div id="WebGLCanvas"></div>
+        </th>
+        <th style="background-color: ghostwhite; height: 500px; width: 780px; text-align: center">
+            <textarea style="overflow:auto;resize:none;background-color: black; color: chartreuse" name="codeview2" rows="28" cols="95" id="codeview2" readonly>
+            </textarea>
+            <br>
+            <label>Ilość wierszy: </label>
+            <input readonly id="linie">&nbsp; &nbsp; &nbsp; &nbsp; 
+            <label>Ilość znaków: </label>
+            <input readonly id="znaki">&nbsp; &nbsp; &nbsp; &nbsp; 
+            <label>FPS: </label>
+            <input readonly id="fps">
+        </th>
+    </tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<table>
+    <thead>
+        <tr>
+            <th style="background-color: ghostwhite; height: 100px; width: 500px; text-align: center">
+                <b>W</b> - do przodu |
+                <b>S</b> - do tyłu |
+                <b>A</b> - w lewo |
+                <b>S</b> - w prawo <br><br>
+                <b>Q</b> - obrót przez lewe ramię |
+                <b>E</b> - obrót przez prawe ramię 
+
+            </th>
+            <th style="background-color: ghostwhite; height: 100px; width: 780px; text-align: left">
+    <table border="0" cellpadding="5">
+        <thead>
+            <tr>
+                <th align="left">
+                    &nbsp; &nbsp; <label>Kolizje: </label><br><br>
+                    &nbsp; &nbsp; <input type="radio" name="Koliz" id="kol1" value="" checked="checked" onchange="kolizje1();"/><label for="kol1">ON</label>
+                    &nbsp; &nbsp; <input type="radio" name="Koliz" id="kol2" value="" onchange="kolizje2();"/><label for="kol2">OFF</label>
+
+                </th>
+                <th align="left">
+                    &nbsp; &nbsp; <label>Światło: </label><br><br>
+                    &nbsp; &nbsp; <input type="radio" name="figura" id="figura1" value="" checked="checked" onchange="swiatlo1();"/><label for="figura1">ON</label>
+                    &nbsp; &nbsp; <input type="radio" name="figura" id="figura2" value="" onchange="swiatlo2();"/><label for="figura1">OFF</label>
+                </th>
+                <th align="center">
+                    &nbsp; &nbsp; <label>Przezroczystość: </label><br><br>
+                    &nbsp; &nbsp; <input type="radio" id="blend1" name="blend" value="" onchange="blend1();"/><label for="blend1">ON</label>
+                    &nbsp; &nbsp; <input type="radio" id="blend2" name="blend" value="" checked="checked" onchange="blend2();"/><label for="blend2">OFF</label>
+                </th>
+            </tr>
+        </thead>
+        <tbody>   
+        </tbody>
+    </table>
+</th>
+</tr>
+</thead>
+<tbody>
+</tbody>
+</table>
+<table style=" color: black; height: 5px; width: 1290px; text-align: left;  background: -webkit-gradient(linear, left top, left bottom, from(#81a8cb), to(#4477a1) ); background: -moz-linear-gradient(-90deg, #81a8cb, #4477a1)">
+    <thead>
+        <tr>
+            <th></th>
+        </tr>
+    </thead>
+</table>
+
+</body>
+</html>
+

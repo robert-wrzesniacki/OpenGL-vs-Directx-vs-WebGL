@@ -1,0 +1,760 @@
+﻿<html>
+    <head>
+        <title>JavaScript & WebGL: Podstawowe elementy grafiki</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+        <script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
+        <script type="text/javascript" src="webgl-utils.js"></script>
+        <script id="shader-fs" type="x-shader/x-fragment">
+            precision mediump float;
+            void main(void) {
+            gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
+            }
+        </script>
+        <script id="shader-vs" type="x-shader/x-vertex">
+            attribute vec3 aVertexPosition;
+            attribute float a_pointSize;
+
+            uniform mat4 uMVMatrix;
+            uniform mat4 uPMatrix;
+
+            void main(void) {
+            gl_Position = uPMatrix * uMVMatrix * vec4(aVertexPosition, 1.0);
+
+            gl_PointSize =  a_pointSize;
+            }
+        </script>
+        <script type="text/javascript">
+
+            var wybor;
+            var rotacja;
+            var wybrot;
+            var ilosc;
+            var pointsize;
+
+
+            function buton1() {
+                wybor = 1;
+                ilosc = 1;
+                document.getElementById("after").max = 17;
+                document.getElementById("after").min = 1;
+                document.getElementById("after").step = 1;
+                document.getElementById("after").value = 1;
+                document.getElementById("point").value = 1;
+                document.getElementById("point").min = 1;
+                document.getElementById("point").max = 20;
+                wypelnij();
+            }
+            function buton2() {
+                wybor = 2;
+                ilosc = 2;
+                document.getElementById("after").max = 34;
+                document.getElementById("after").min = 2;
+                document.getElementById("after").step = 2;
+                document.getElementById("after").value = 2;
+                document.getElementById("point").value = 1;
+                document.getElementById("point").min = 1;
+                document.getElementById("point").max = 1;
+                wypelnij();
+            }
+            function buton3() {
+                wybor = 3;
+                ilosc = 2;
+                document.getElementById("after").max = 18;
+                document.getElementById("after").min = 2;
+                document.getElementById("after").step = 1;
+                document.getElementById("after").value = 2;
+                document.getElementById("point").value = 1;
+                document.getElementById("point").min = 1;
+                document.getElementById("point").max = 1;
+                wypelnij();
+            }
+            function buton4() {
+                wybor = 4;
+                ilosc = 2;
+                document.getElementById("after").max = 18;
+                document.getElementById("after").min = 2;
+                document.getElementById("after").step = 1;
+                document.getElementById("after").value = 2;
+                document.getElementById("point").value = 1;
+                document.getElementById("point").min = 1;
+                document.getElementById("point").max = 1;
+                wypelnij();
+            }
+            function buton5() {
+                wybor = 5;
+                ilosc = 3;
+                document.getElementById("after").max = 27;
+                document.getElementById("after").min = 3;
+                document.getElementById("after").step = 3;
+                document.getElementById("after").value = 3;
+                document.getElementById("point").value = 1;
+                document.getElementById("point").min = 1;
+                document.getElementById("point").max = 1;
+                wypelnij();
+            }
+            function buton6() {
+                wybor = 6;
+                ilosc = 3;
+                document.getElementById("after").max = 10;
+                document.getElementById("after").min = 3;
+                document.getElementById("after").step = 1;
+                document.getElementById("after").value = 3;
+                document.getElementById("point").value = 1;
+                document.getElementById("point").min = 1;
+                document.getElementById("point").max = 1;
+                wypelnij();
+            }
+            function buton7() {
+                wybor = 7;
+                ilosc = 3;
+                document.getElementById("after").max = 14;
+                document.getElementById("after").min = 3;
+                document.getElementById("after").step = 1;
+                document.getElementById("after").value = 3;
+                document.getElementById("point").value = 1;
+                document.getElementById("point").min = 1;
+                document.getElementById("point").max = 1;
+                wypelnij();
+            }
+
+            function zmien() {
+                ilosc = document.getElementById("after").value;
+                wypelnij();
+            }
+            function wielkosc() {
+                pointsize = document.getElementById("point").value * 1.0;
+                wypelnij();
+            }
+            function wybrotacji() {
+                if (document.getElementById("osx").checked && document.getElementById("osy").checked && document.getElementById("osz").checked) {
+                    wybrot = 7;
+                    wypelnij();
+                } else if (document.getElementById("osy").checked && document.getElementById("osz").checked) {
+                    wybrot = 6;
+                    wypelnij();
+                } else if (document.getElementById("osx").checked && document.getElementById("osz").checked) {
+                    wybrot = 5;
+                    wypelnij();
+                } else if (document.getElementById("osx").checked && document.getElementById("osy").checked) {
+                    wybrot = 4;
+                    wypelnij();
+                } else if (document.getElementById("osz").checked) {
+                    wybrot = 3;
+                    wypelnij();
+                } else if (document.getElementById("osy").checked) {
+                    wybrot = 2;
+                    wypelnij();
+                } else if (document.getElementById("osx").checked) {
+                    wybrot = 1;
+                    wypelnij();
+                } else {
+                    wybrot = 0;
+                    wypelnij();
+                }
+            }
+            function wypelnij() {
+                document.getElementById("codeview2").value =
+                        "gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);\n\
+gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);\n\
+mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);\n\
+mat4.identity(mvMatrix);\n\
+mat4.translate(mvMatrix, [0.0, 0.0, -6.0]);\n\
+\n\
+";
+
+
+                if (wybrot > 0) {
+                    switch (wybrot) {
+                        case 1:
+                            document.getElementById("codeview2").value += "mat4.rotate(mvMatrix, degToRad(rotacja), [1, 0, 0]);\n\
+\n\
+";
+                            break;
+                        case 2:
+                            document.getElementById("codeview2").value += "mat4.rotate(mvMatrix, degToRad(rotacja), [0, 1, 0]);\n\
+\n\
+";
+                            break;
+                        case 3:
+                            document.getElementById("codeview2").value += "mat4.rotate(mvMatrix, degToRad(rotacja), [0, 0, 1]);\n\
+\n\
+";
+                            break;
+                        case 4:
+                            document.getElementById("codeview2").value += "mat4.rotate(mvMatrix, degToRad(rotacja), [1, 1, 0]);\n\
+\n\
+";
+                            break;
+                        case 5:
+                            document.getElementById("codeview2").value += "mat4.rotate(mvMatrix, degToRad(rotacja), [1, 0, 1]);\n\
+\n\
+";
+                            break;
+                        case 6:
+                            document.getElementById("codeview2").value += "mat4.rotate(mvMatrix, degToRad(rotacja), [0, 1, 1]);\n\
+\n\
+";
+                            break;
+                        case 7:
+                            document.getElementById("codeview2").value += "mat4.rotate(mvMatrix, degToRad(rotacja), [1, 1, 1]);\n\
+\n\
+";
+                            break;
+
+                    }
+                }
+                switch (wybor)
+                {
+                    case 1:
+                        document.getElementById("codeview2").value += "\t\gl.vertexAttrib1f(gl.aPointSize, " + pointsize + ");\n\
+\t\gl.bindBuffer(gl.ARRAY_BUFFER, pointVertexPositionBuffer);\n\
+\t\gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);\n\
+\t\setMatrixUniforms();\n\
+\t\gl.drawArrays(gl.POINTS, 0, " + ilosc + ");\n\
+\n\
+";
+                        break;
+                    case 2:
+                        document.getElementById("codeview2").value += "\t\gl.bindBuffer(gl.ARRAY_BUFFER, lineVertexPositionBuffer);\n\
+\t\gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);\n\
+\t\setMatrixUniforms();\n\
+\t\gl.drawArrays(gl.LINES, 0, " + ilosc + ");\n\
+\n\
+";
+                        break;
+                    case 3:
+                        document.getElementById("codeview2").value += "\t\gl.bindBuffer(gl.ARRAY_BUFFER, linesVertexPositionBuffer);\n\
+\t\gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);\n\
+\t\setMatrixUniforms();\n\
+\t\gl.drawArrays(gl.LINE_STRIP, 0, " + ilosc + ");\n\
+\n\
+";
+                        break;
+                    case 4:
+                        document.getElementById("codeview2").value += "\t\gl.bindBuffer(gl.ARRAY_BUFFER, linesfVertexPositionBuffer);\n\
+\t\gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);\n\
+\t\setMatrixUniforms();\n\
+\t\gl.drawArrays(gl.LINE_LOOP, 0, " + ilosc + ");\n\
+\n\
+";
+
+                        break;
+                    case 5:
+                        document.getElementById("codeview2").value += "\t\gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);\n\
+\t\gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);\n\
+\t\setMatrixUniforms();\n\
+\t\gl.drawArrays(gl.TRIANGLES, 0, " + ilosc + ");\n\
+\n\
+";
+                        break;
+                    case 6:
+                        document.getElementById("codeview2").value += "\t\gl.bindBuffer(gl.ARRAY_BUFFER, trianglelVertexPositionBuffer);\n\
+\t\gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);\n\
+\t\setMatrixUniforms();\n\
+\t\gl.drawArrays(gl.TRIANGLE_STRIP, 0, " + ilosc + ");\n\
+\n\
+";
+                        break;
+                    case 7:
+                        document.getElementById("codeview2").value += "\t\gl.bindBuffer(gl.ARRAY_BUFFER, trianglefVertexPositionBuffer);\n\
+\t\gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);\n\
+\t\setMatrixUniforms();\n\
+\t\gl.drawArrays(gl.TRIANGLE_FAN, 0, " + ilosc + ");\n\
+\n\
+";
+                        break;
+                }
+                if (wybrot > 0) {
+                    document.getElementById("codeview2").value += "rotacja += 0.5;\n\
+\n\
+";
+                }
+                document.getElementById("znaki").value = document.getElementById("codeview2").value.length;
+                document.getElementById("linie").value = document.getElementById("codeview2").value.split("\n").length - 2;
+            }
+
+            var gl;
+            function initGL(canvas) {
+                try {
+                    gl = canvas.getContext("experimental-webgl");
+                    gl.viewportWidth = canvas.width;
+                    gl.viewportHeight = canvas.height;
+                } catch (e) {
+                }
+                if (!gl) {
+                    alert("Could not initialise WebGL, sorry :-(");
+                }
+            }
+            function getShader(gl, id) {
+                var shaderScript = document.getElementById(id);
+                if (!shaderScript) {
+                    return null;
+                }
+                var str = "";
+                var k = shaderScript.firstChild;
+                while (k) {
+                    if (k.nodeType == 3) {
+                        str += k.textContent;
+                    }
+                    k = k.nextSibling;
+                }
+                var shader;
+                if (shaderScript.type == "x-shader/x-fragment") {
+                    shader = gl.createShader(gl.FRAGMENT_SHADER);
+                } else if (shaderScript.type == "x-shader/x-vertex") {
+                    shader = gl.createShader(gl.VERTEX_SHADER);
+                } else {
+                    return null;
+                }
+                gl.shaderSource(shader, str);
+                gl.compileShader(shader);
+                if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+                    alert(gl.getShaderInfoLog(shader));
+                    return null;
+                }
+                return shader;
+            }
+            var shaderProgram;
+            function initShaders() {
+                var fragmentShader = getShader(gl, "shader-fs");
+                var vertexShader = getShader(gl, "shader-vs");
+                shaderProgram = gl.createProgram();
+                gl.attachShader(shaderProgram, vertexShader);
+                gl.attachShader(shaderProgram, fragmentShader);
+                gl.linkProgram(shaderProgram);
+                if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+                    alert("Could not initialise shaders");
+                }
+                gl.useProgram(shaderProgram);
+                shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+                gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+                gl.aPointSize = gl.getAttribLocation(shaderProgram, "a_pointSize");
+                shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+                shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+            }
+            var mvMatrix = mat4.create();
+            var mvMatrixStack = [];
+            var pMatrix = mat4.create();
+            function mvPushMatrix() {
+                var copy = mat4.create();
+                mat4.set(mvMatrix, copy);
+                mvMatrixStack.push(copy);
+            }
+            function mvPopMatrix() {
+                if (mvMatrixStack.length == 0) {
+                    throw "Invalid popMatrix!";
+                }
+                mvMatrix = mvMatrixStack.pop();
+            }
+            function setMatrixUniforms() {
+                gl.uniformMatrix4fv(shaderProgram.pMatrixUniform, false, pMatrix);
+                gl.uniformMatrix4fv(shaderProgram.mvMatrixUniform, false, mvMatrix);
+            }
+            function degToRad(degrees) {
+                return degrees * Math.PI / 180;
+            }
+
+
+            var pointVertexPositionBuffer;
+            var lineVertexPositionBuffer;
+            var linesVertexPositionBuffer;
+            var linesfVertexPositionBuffer;
+            var triangleVertexPositionBuffer;
+            var trianglelVertexPositionBuffer;
+            var trianglefVertexPositionBuffer;
+            function initBuffers() {
+
+                pointVertexPositionBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, pointVertexPositionBuffer);
+                var vertices = [
+                    0.0, 0.0, 0.0,
+                    0.0, 1.0, 0.0,
+                    0.75, 0.75, 0.0,
+                    1.0, 0.0, 0.0,
+                    0.75, -0.75, 0.0,
+                    0.0, -1.0, 0.0,
+                    -0.75, -0.75, 0.0,
+                    -1.0, 0.0, 0.0,
+                    -0.75, 0.75, 0.0,
+                    0.0, 2.0, 0.0,
+                    1.75, 1.75, 0.0,
+                    2.0, 0.0, 0.0,
+                    1.75, -1.75, 0.0,
+                    0.0, -2.0, 0.0,
+                    -1.75, -1.75, 0.0,
+                    -2.0, 0.0, 0.0,
+                    -1.75, 1.75, 0.0
+
+                ];
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+                lineVertexPositionBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, lineVertexPositionBuffer);
+                var vertices = [
+                    -1.0, 0.0, 0.0,
+                    1.0, 0.0, 0.0,
+                    0.0, -1.0, 0.0,
+                    0.0, 1.0, 0.0,
+                    0.0, 1.0, 0.0,
+                    1.0, 0.0, 0.0,
+                    1.0, 0.0, 0.0,
+                    0.0, -1.0, 0.0,
+                    0.0, -1.0, 0.0,
+                    -1.0, 0.0, 0.0,
+                    -1.0, 0.0, 0.0,
+                    0.0, 1.0, 0.0,
+                    -1.0, 1.0, 0.0,
+                    1.0, 1.0, 0.0,
+                    1.0, 1.0, 0.0,
+                    1.0, -1.0, 0.0,
+                    1.0, -1.0, 0.0,
+                    -1.0, -1.0, 0.0,
+                    -1.0, -1.0, 0.0,
+                    -1.0, 1.0, 0.0,
+                    -2.0, 0.0, 0.0,
+                    0.0, 2.0, 0.0,
+                    0.0, 2.0, 0.0,
+                    2.0, 0.0, 0.0,
+                    2.0, 0.0, 0.0,
+                    0.0, -2.0, 0.0,
+                    0.0, -2.0, 0.0,
+                    -2.0, 0.0, 0.0,
+                    -2.0, -2.0, 0.0,
+                    -2.0, 2.0, 0.0,
+                    -2.0, 2.0, 0.0,
+                    2.0, 2.0, 0.0,
+                    2.0, 2.0, 0.0,
+                    2.0, -2.0, 0.0
+
+                ];
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+                linesVertexPositionBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, linesVertexPositionBuffer);
+                var vertices = [
+                    0.0, 1.0, 0.0,
+                    0.75, 0.75, 0.0,
+                    1.0, 0.0, 0.0,
+                    0.75, -0.75, 0.0,
+                    0.0, -1.0, 0.0,
+                    -0.75, -0.75, 0.0,
+                    -1.0, 0.0, 0.0,
+                    -0.75, 0.75, 0.0,
+                    0.0, 1.0, 0.0,
+                    0.0, 2.0, 0.0,
+                    1.75, 1.75, 0.0,
+                    2.0, 0.0, 0.0,
+                    1.75, -1.75, 0.0,
+                    0.0, -2.0, 0.0,
+                    -1.75, -1.75, 0.0,
+                    -2.0, 0.0, 0.0,
+                    -1.75, 1.75, 0.0,
+                    0.0, 2.0, 0.0
+                ];
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+                linesfVertexPositionBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, linesfVertexPositionBuffer);
+                var vertices = [
+                    0.0, 0.0, 0.0,
+                    0.0, 1.0, 0.0,
+                    0.75, 0.75, 0.0,
+                    1.0, 0.0, 0.0,
+                    0.75, -0.75, 0.0,
+                    0.0, -1.0, 0.0,
+                    -0.75, -0.75, 0.0,
+                    -1.0, 0.0, 0.0,
+                    -0.75, 0.75, 0.0,
+                    0.0, 2.0, 0.0,
+                    1.75, 1.75, 0.0,
+                    2.0, 0.0, 0.0,
+                    1.75, -1.75, 0.0,
+                    0.0, -2.0, 0.0,
+                    -1.75, -1.75, 0.0,
+                    -2.0, 0.0, 0.0,
+                    -1.75, 1.75, 0.0,
+                    0.0, 2.0, 0.0
+                ];
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+                triangleVertexPositionBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
+                var vertices = [
+                    0.0, 0.75, 0.0,
+                    -0.75, -0.75, 0.0,
+                    0.75, -0.75, 0.0,
+                    -2.0, 2.0, 0.0,
+                    -1.0, 2.0, 0.0,
+                    -1.5, 1.0, 0.0,
+                    -0.5, 2.0, 0.0,
+                    0.5, 2.0, 0.0,
+                    0.0, 1.0, 0.0,
+                    2.0, 2.0, 0.0,
+                    1.0, 2.0, 0.0,
+                    1.5, 1.0, 0.0,
+                    2.0, 0.5, 0.0,
+                    2.0, -0.5, 0.0,
+                    1.0, 0.0, 0.0,
+                    2.0, -2.0, 0.0,
+                    1.0, -2.0, 0.0,
+                    1.5, -1.0, 0.0,
+                    -0.5, -2.0, 0.0,
+                    0.5, -2.0, 0.0,
+                    0.0, -1.0, 0.0,
+                    -2.0, -2.0, 0.0,
+                    -1.0, -2.0, 0.0,
+                    -1.5, -1.0, 0.0,
+                    -2.0, 0.5, 0.0,
+                    -2.0, -0.5, 0.0,
+                    -1.0, 0.0, 0.0
+                ];
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+                trianglelVertexPositionBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, trianglelVertexPositionBuffer);
+                var vertices = [
+                    -1.5, 2.0, 0.0,
+                    -0.5, 2.0, 0.0,
+                    -1.0, 1.0, 0.0,
+                    0.0, 1.0, 0.0,
+                    -0.5, 0.0, 0.0,
+                    0.5, 0.0, 0.0,
+                    0.0, -1.0, 0.0,
+                    1.0, -1.0, 0.0,
+                    0.5, -2.0, 0.0,
+                    1.5, -2.0, 0.0
+                ];
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+
+                trianglefVertexPositionBuffer = gl.createBuffer();
+                gl.bindBuffer(gl.ARRAY_BUFFER, trianglefVertexPositionBuffer);
+                var vertices = [
+                    0.0, 0.0, 0.0,
+                    0.0, 2.0, 0.0,
+                    1.0, 1.75, 0.0,
+                    1.75, 1.0, 0.0,
+                    2.0, 0.0, 0.0,
+                    1.75, -1.0, 0.0,
+                    1.0, -1.75, 0.0,
+                    0.0, -2.0, 0.0,
+                    -1.0, -1.75, 0.0,
+                    -1.75, -1.0, 0.0,
+                    -2.0, 0.0, 0.0,
+                    -1.75, 1.0, 0.0,
+                    -1.0, 1.75, 0.0,
+                    0.0, 2.0, 0.0
+                ];
+                gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertices), gl.STATIC_DRAW);
+            }
+            function drawScene() {
+                gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+                gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+                mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+                mat4.identity(mvMatrix);
+                mat4.translate(mvMatrix, [0.0, 0.0, -6.0]);
+
+                if (wybrot > 0) {
+                    switch (wybrot) {
+                        case 1:
+                            mat4.rotate(mvMatrix, degToRad(rotacja), [1, 0, 0]);
+                            break;
+                        case 2:
+                            mat4.rotate(mvMatrix, degToRad(rotacja), [0, 1, 0]);
+                            break;
+                        case 3:
+                            mat4.rotate(mvMatrix, degToRad(rotacja), [0, 0, 1]);
+                            break;
+                        case 4:
+                            mat4.rotate(mvMatrix, degToRad(rotacja), [1, 1, 0]);
+                            break;
+                        case 5:
+                            mat4.rotate(mvMatrix, degToRad(rotacja), [1, 0, 1]);
+                            break;
+                        case 6:
+                            mat4.rotate(mvMatrix, degToRad(rotacja), [0, 1, 1]);
+                            break;
+                        case 7:
+                            mat4.rotate(mvMatrix, degToRad(rotacja), [1, 1, 1]);
+                            break;
+
+                    }
+                } else {
+                    rotacja = 0.0;
+                }
+                switch (wybor)
+                {
+                    case 1:
+                        gl.vertexAttrib1f(gl.aPointSize, pointsize);
+                        gl.bindBuffer(gl.ARRAY_BUFFER, pointVertexPositionBuffer);
+                        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+                        setMatrixUniforms();
+                        gl.drawArrays(gl.POINTS, 0, ilosc);
+                        break;
+                    case 2:
+                        gl.bindBuffer(gl.ARRAY_BUFFER, lineVertexPositionBuffer);
+                        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+                        setMatrixUniforms();
+                        gl.drawArrays(gl.LINES, 0, ilosc);
+                        break;
+                    case 3:
+                        gl.bindBuffer(gl.ARRAY_BUFFER, linesVertexPositionBuffer);
+                        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+                        setMatrixUniforms();
+                        gl.drawArrays(gl.LINE_STRIP, 0, ilosc);
+                        break;
+                    case 4:
+                        gl.bindBuffer(gl.ARRAY_BUFFER, linesfVertexPositionBuffer);
+                        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+                        setMatrixUniforms();
+                        gl.drawArrays(gl.LINE_LOOP, 0, ilosc);
+
+                        break;
+                    case 5:
+                        gl.bindBuffer(gl.ARRAY_BUFFER, triangleVertexPositionBuffer);
+                        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+                        setMatrixUniforms();
+                        gl.drawArrays(gl.TRIANGLES, 0, ilosc);
+                        break;
+                    case 6:
+                        gl.bindBuffer(gl.ARRAY_BUFFER, trianglelVertexPositionBuffer);
+                        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+                        setMatrixUniforms();
+                        gl.drawArrays(gl.TRIANGLE_STRIP, 0, ilosc);
+                        break;
+                    case 7:
+                        gl.bindBuffer(gl.ARRAY_BUFFER, trianglefVertexPositionBuffer);
+                        gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, 3, gl.FLOAT, false, 0, 0);
+                        setMatrixUniforms();
+                        gl.drawArrays(gl.TRIANGLE_FAN, 0, ilosc);
+                        break;
+                }
+
+                rotacja += 0.5;
+
+
+            }
+
+            var frameCount = 0;
+            var lastTime = 0;
+
+            function animate() {
+                frameCount++;
+                var timeNow = new Date().getTime();
+                var elapsed = timeNow - lastTime;
+                if (elapsed > 100) {
+                    document.getElementById("fps").value = frameCount / (elapsed / 1000.0);
+                    lastTime = timeNow;
+                    frameCount = 0;
+                }
+                return fps;
+            }
+            function tick() {
+                requestAnimFrame(tick);
+                drawScene();
+                animate();
+            }
+
+            function webGLStart() {
+                var canvas = document.getElementById("WebGLPanel");
+                initGL(canvas);
+                initShaders();
+                initBuffers();
+                gl.clearColor(0.0, 0.0, 0.0, 1.0);
+                gl.enable(gl.DEPTH_TEST);
+                wybor = 0;
+                rotacja = 0;
+                wybor = 1;
+                ilosc = 1;
+                pointsize = 1;
+                document.getElementById("after").max = 17;
+                document.getElementById("after").min = 1;
+                document.getElementById("after").step = 1;
+                document.getElementById("after").value = 1;
+                wypelnij();
+                tick();
+            }
+        </script>
+
+
+    </head>
+    <body onload="webGLStart();">
+
+        <table border="0">
+            <thead>
+                <tr>
+                    <th style=" color: black; height: 30px; width: 1196px; text-align: left;  background: -webkit-gradient(linear, left top, left bottom, from(#81a8cb), to(#4477a1) ); background: -moz-linear-gradient(-90deg, #81a8cb, #4477a1)">
+                        &nbsp;&nbsp;&nbsp; JavaScript & WebGL: Podstawowe elementy grafiki
+
+                    </th>
+                    <th style="color: black; height: 30px; width: 40px; text-align: center; background: -webkit-gradient(linear, left top, left bottom, from(#81a8cb), to(#4477a1) ); background: -moz-linear-gradient(-90deg, #81a8cb, #4477a1)">
+                        <a href="info.html"><img src="Data/info.png" width="35" height="35" alt=""/></a>
+                    </th>
+                    <th style="color: black; height: 30px; width: 40px; text-align: center; background: -webkit-gradient(linear, left top, left bottom, from(#81a8cb), to(#4477a1) ); background: -moz-linear-gradient(-90deg, #81a8cb, #4477a1)">
+                        <a href="index.html"><img src="Data/home.png" width="35" height="35" alt=""/></a>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <th style="background-color: ghostwhite; height: 500px; width: 500px; text-align: center">
+                        <canvas id="WebGLPanel" style="border: none;" width="500" height="500"></canvas>        
+                    </th>
+                    <th style="background-color: ghostwhite; height: 500px; width: 780px; text-align: center">
+                        <textarea style="overflow:auto;resize:none;background-color: black; color: chartreuse" name="codeview2" rows="28" cols="95" id="codeview2" readonly>
+                        </textarea>
+                        <br>
+                        <label>Ilość wierszy: </label>
+                        <input readonly id="linie">&nbsp; &nbsp; &nbsp; &nbsp; 
+                        <label>Ilość znaków: </label>
+                        <input readonly id="znaki">&nbsp; &nbsp; &nbsp; &nbsp; 
+                        <label>FPS: </label>
+                        <input readonly id="fps">
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <table>
+            <thead>
+                <tr>
+                    <th style="background-color: ghostwhite; height: 100px; width: 500px; text-align: center">
+                        <input style="height: 40px; width: 150px" onclick="buton1();" type="submit" value="POINTS" name="point" id="button1" /><br><br>
+                        <input style="height: 40px; width: 150px" onclick="buton2();" type="submit" value="LINES" name="line" id="button2"/>
+                        <input style="height: 40px; width: 150px" onclick="buton3();" type="submit" value="LINE_STRIP" name="linel" id="button3"/>
+                        <input style="height: 40px; width: 150px" onclick="buton4();" type="submit" value="LINE_LOOP" name="lines" id="button4"/><br><br>
+                        <input style="height: 40px; width: 150px" onclick="buton5();" type="submit" value="TRIANGLES" name="tri" id="button5"/>
+                        <input style="height: 40px; width: 150px" onclick="buton6();" type="submit" value="TRIANGLE_STRIP" name="tril" id="button6"/>
+                        <input style="height: 40px; width: 150px" onclick="buton7();" type="submit" value="TRIANGLE_FAN" name="trif" id="button7"/>
+
+                    </th>
+                    <th style="background-color: ghostwhite; height: 100px; width: 780px; text-align: left">
+                        &nbsp; &nbsp; &nbsp; &nbsp;<label>Ilość punktów: </label>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input step="1" min="1" max="17" id="after" value="1" type="number" onchange="zmien();"><br><br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;<label>Wielkość punktów: </label>
+                        &nbsp;<input step="0.5" min="1" max="20" id="point" value="1" type="number" onchange="wielkosc();"><br><br>
+                        &nbsp; &nbsp; &nbsp; &nbsp;<label>Rotacja: </label>
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<input type="checkbox" name="Oś X"  id="osx" onchange="wybrotacji();"/><label for="osx">Oś X</label>
+                        <input type="checkbox" name="Oś Y"  id="osy" onchange="wybrotacji();"/><label for="osx">Oś Y</label>
+                        <input type="checkbox" name="Oś Z"  id="osz" onchange="wybrotacji();"/><label for="osx">Oś Z</label>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        <table style=" color: black; height: 5px; width: 1290px; text-align: left;  background: -webkit-gradient(linear, left top, left bottom, from(#81a8cb), to(#4477a1) ); background: -moz-linear-gradient(-90deg, #81a8cb, #4477a1)">
+            <thead>
+                <tr>
+                    <th></th>
+                </tr>
+            </thead>
+        </table>
+
+
+</body>
+</html>
